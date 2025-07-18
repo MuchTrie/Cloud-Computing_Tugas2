@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const AWS = require('aws-sdk');
 const multer = require('multer');
@@ -9,10 +10,11 @@ const port = 3000;
 
 // Konfigurasi AWS
 AWS.config.update({
-  accessKeyId: process.env.AWS_ACCESS_KEY_ID || 'your-access-key-here',    
-  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || 'your-secret-key-here', 
-  region: process.env.AWS_REGION || 'ap-southeast-2' 
+  accessKeyId: process.env.AWS_ACCESS_KEY_ID,    
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY, 
+  region: process.env.AWS_REGION 
 });
+
 
 const s3 = new AWS.S3();
 const upload = multer({ dest: 'uploads/' });
@@ -29,16 +31,11 @@ app.get('/files', (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'list-files.html'));
 });
 
-// Route untuk halaman files lama (jika masih dibutuhkan)
-app.get('/files-old', (req, res) => {
-  res.sendFile(path.join(__dirname, 'views', 'files.html'));
-});
-
 // API endpoint untuk mendapatkan list files dari S3
 app.get('/api/files', async (req, res) => {
   try {
     const params = {
-      Bucket: process.env.S3_BUCKET_NAME || 'much-bucket'
+      Bucket: process.env.S3_BUCKET_NAME
     };
     
     const data = await s3.listObjectsV2(params).promise();
@@ -46,7 +43,7 @@ app.get('/api/files', async (req, res) => {
       name: file.Key,
       size: formatFileSize(file.Size),
       uploadDate: formatDate(file.LastModified),
-      url: `https://much-bucket.s3.ap-southeast-2.amazonaws.com/${file.Key}`
+      url: `https://${process.env.S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${file.Key}`
     }));
     
     res.json(files);
@@ -103,7 +100,7 @@ app.post('/upload', upload.single('file'), (req, res) => {
   const fileName = `${nrp}_${sanitizedNama}_${timestamp}_${req.file.originalname}`;
   
   const params = {
-    Bucket: process.env.S3_BUCKET_NAME || 'much-bucket', 
+    Bucket: process.env.S3_BUCKET_NAME, 
     Key: fileName,
     Body: fileContent
   };
