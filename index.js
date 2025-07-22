@@ -94,10 +94,9 @@ app.post('/upload', upload.single('file'), (req, res) => {
 
   const fileContent = fs.readFileSync(req.file.path);
   
-  // Format nama file: [NRP]_[Nama]_[OriginalFileName]
-  const timestamp = new Date().toISOString().split('T')[0];
+  // Format nama file: [Nama]_[NRP]_[OriginalFileName]
   const sanitizedNama = nama.replace(/[^a-zA-Z0-9]/g, '_');
-  const fileName = `${nrp}_${sanitizedNama}_${timestamp}_${req.file.originalname}`;
+  const fileName = `${sanitizedNama}_${nrp}_${req.file.originalname}`;
   
   const params = {
     Bucket: process.env.S3_BUCKET_NAME, 
