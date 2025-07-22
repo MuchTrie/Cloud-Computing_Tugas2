@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Daftar Tugas - AWS S3</title>
     <link rel="stylesheet" href="style.css">
-</head>
 <body>
     <!-- Animated Particles Background -->
     <div class="particles">
@@ -230,26 +229,21 @@
                 
                 fileCard.innerHTML = `
                     <div class="file-header">
-                        <div class="file-icon">${getFileIcon(file.name)}</div>
+                        <div class="file-icon">${getFileIcon(file.originalName || file.name)}</div>
                         <div class="file-info">
-                            <h3 class="file-name">${file.name}</h3>
+                            <h3 class="file-name">${file.originalName || file.name}</h3>
+                            <div class="student-info">
+                                <p class="file-meta">� <strong>${file.nama}</strong></p>
+                                <p class="file-meta">🆔 NRP: ${file.nrp}</p>
+                            </div>
                             <p class="file-meta">📦 ${file.size}</p>
-                            <p class="file-meta">📅 Last Modified: ${file.uploadDate}</p>
+                            <p class="file-meta">� Upload: ${file.uploadDate}</p>
                         </div>
                     </div>
                     
-                    ${file.studentInfo ? `
-                        <div class="student-info">
-                            <span class="student-badge">👤 ${file.studentInfo}</span>
-                        </div>
-                    ` : ''}
-                    
                     <div class="file-actions">
-                        <button class="action-btn download" onclick="downloadFile('${file.url}', '${file.name}')" title="Download">
+                        <button class="action-btn download" onclick="downloadFile('${file.url}', '${file.originalName || file.name}')" title="Download File">
                             📥 Download
-                        </button>
-                        <button class="action-btn view" onclick="viewFile('${file.url}')" title="Lihat">
-                            👁️ Lihat
                         </button>
                     </div>
                 `;
@@ -267,11 +261,6 @@
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-        }
-
-        // View file in new tab
-        function viewFile(url) {
-            window.open(url, '_blank');
         }
 
         // Refresh files
